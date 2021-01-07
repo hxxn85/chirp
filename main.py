@@ -5,12 +5,11 @@ import numpy as np
 def mag2db(v):
     return 20*np.log10(abs(v))
 
-def ncc(x, y):
+def xcorr(x, y):
     a, b = np.array(x), np.array(y)
     a = (a - np.mean(a)) / (np.std(a) * len(a))
     b = (b - np.mean(b)) / np.std(b)
     return signal.correlate(a, b), signal.correlation_lags(len(x), len(y))
-
 
 bw = 4e6
 tp = 10e-6
@@ -27,7 +26,7 @@ plt.legend()
 plt.grid()
 plt.show()
 
-c, lags = ncc(x, y)
+c, lags = xcorr(x, y)
 plt.plot(lags*ts, mag2db(c))
 plt.ylim([-50, 0])
 plt.grid()
@@ -49,16 +48,31 @@ plt.show()
 
 #%%
 nyq = 0.5*fs
-low, high = 1e6 / nyq, 2e6 / nyq
+low, high = 1e6*2/nyq, 3e6/nyq
 b, a = signal.butter(5, [low, high], btype='band')
 
 t = np.arange(n)*ts
 plt.plot(t, y)
-plt.plot(t, signal.filtfilt(b, a, y))
+plt.plot(t, signal.filtfilt(b, a, x))
 plt.show()
 
-c, lags = ncc(x, signal.filtfilt(b, a, y))
+#%%
+c, lags = xcorr(y, signal.filtfilt(b, a, x))
 plt.plot(lags*ts, mag2db(c))
-plt.ylim([-50, 0])
+# plt.ylim([-50, 0])
 plt.grid()
+plt.show()
+
+#%%
+
+f, pxx = signal.periodogram([y, signal.filtfilt(b, a, x)], fs=fs, nfft=4096, return_onesided=False, scaling='spectrum')
+plt.plot(f, mag2db(pxx[0]), label='Pxx')
+plt.plot(f, mag2db(pxx[1]), label='Pyy')
+plt.show()
+
+#%%
+fx = signal.filtfilt(b, a, x)
+plt.plot(fx)
+plt.plot(fx/np.max(fx))
+plt.plot(y)
 plt.show()
