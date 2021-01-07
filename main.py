@@ -27,7 +27,7 @@ plt.legend()
 plt.grid()
 plt.show()
 
-c, lags = ncc(x, x)
+c, lags = ncc(x, y)
 plt.plot(lags*ts, mag2db(c))
 plt.ylim([-50, 0])
 plt.grid()
@@ -47,3 +47,18 @@ plt.ylim([0, 4e6])
 plt.colorbar()
 plt.show()
 
+#%%
+nyq = 0.5*fs
+low, high = 1e6 / nyq, 2e6 / nyq
+b, a = signal.butter(5, [low, high], btype='band')
+
+t = np.arange(n)*ts
+plt.plot(t, y)
+plt.plot(t, signal.filtfilt(b, a, y))
+plt.show()
+
+c, lags = ncc(x, signal.filtfilt(b, a, y))
+plt.plot(lags*ts, mag2db(c))
+plt.ylim([-50, 0])
+plt.grid()
+plt.show()
