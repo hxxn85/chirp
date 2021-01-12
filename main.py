@@ -1,15 +1,7 @@
 from scipy import signal
 from matplotlib import pyplot as plt
 import numpy as np
-
-def mag2db(v):
-    return 20*np.log10(abs(v))
-
-def xcorr(x, y):
-    a, b = np.array(x), np.array(y)
-    a = (a - np.mean(a)) / (np.std(a) * len(a))
-    b = (b - np.mean(b)) / np.std(b)
-    return signal.correlate(a, b), signal.correlation_lags(len(x), len(y))
+from gwu import *
 
 bw = 4e6
 tp = 10e-6
@@ -40,8 +32,8 @@ plt.ylim([-50, 0])
 plt.grid()
 plt.show()
 
-f, t, sxx = signal.spectrogram(y, fs=fs, nperseg=160, noverlap=159, nfft=512, scaling='spectrum', mode='magnitude')
-plt.pcolormesh(t, f, sxx, shading='auto', cmap='jet')
+f, t, sxx = signal.spectrogram(y, fs=fs, nperseg=160, noverlap=159, nfft=512, scaling='spectrum')
+plt.pcolormesh(t, f, sxx, shading='gouraud', cmap='gray_r')
 plt.ylim([0, 4e6])
 plt.colorbar()
 plt.show()
