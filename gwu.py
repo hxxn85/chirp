@@ -12,14 +12,19 @@ def freqx(b: float, nradar: int) -> tuple:
     return [x for y in f0 for x in y], [x for y in f1 for x in y]
 
 def mag2db(x):
-    return 20 * np.log10(abs(x))
+    return 20 * np.log10(abs(np.array(x)))
 
-def xcorr(x, y, normalize=True):
+def xcorr(x, y, normalize=True, lags=True):
     a, b = np.array(x), np.array(y)
     if normalize:
         a = (a - np.mean(a)) / (np.std(a) * len(a))
         b = (b - np.mean(b)) / np.std(b)
-    return signal.correlate(a, b), signal.correlation_lags(len(x), len(y))
+
+    if lags:
+        return signal.correlate(a, b), signal.correlation_lags(len(x), len(y))
+    else:
+        return signal.correlate(a, b)
+
 
 class Radar:
     def __init__(self, bw: float, tp:float, f0: float, f1: float):
