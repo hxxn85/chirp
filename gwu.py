@@ -14,6 +14,9 @@ def freqx(b: float, nradar: int) -> tuple:
 def mag2db(x):
     return 20 * np.log10(abs(np.array(x)))
 
+def pow2db(x):
+    return 10 * np.log10(abs(np.array(x)))
+
 def xcorr(x, y, normalize=True, lags=True):
     a, b = np.array(x), np.array(y)
     if normalize:
