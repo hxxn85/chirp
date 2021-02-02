@@ -1,6 +1,7 @@
 from scipy.optimize import dual_annealing
-from gwu import *
+from chirp.base import *
 import itertools
+import numpy as np
 
 def _is_unique(x):
     x = np.array(x).astype(np.int32)
@@ -15,7 +16,7 @@ def _chirp_correlate(idx1, idx2, *args):
     y = signal.chirp(t, f0[idx2], tp, f1[idx2])
     return  np.max(np.abs(xcorr(x, y, lags=False)))
 
-def _func(x, *args):
+def func(x, *args):
     """
     objective(cost) function for simulated annealing
     max cross correlation peak over available set of chirp signals
@@ -30,7 +31,7 @@ def _func(x, *args):
     comb = list(itertools.combinations(x, 2))
     return np.sum([_chirp_correlate(f[0], f[1], *args) for f in comb])
 
-def _callback(x, f, context):
+def callback(x, f, context):
     print(np.array(x).astype(np.int32), f, context)
 
 def simulated_annealing(b, tp, nseg, nradar, objfun, callback=None):
@@ -53,8 +54,3 @@ def simulated_annealing(b, tp, nseg, nradar, objfun, callback=None):
     lower, upper = 0, len(f0)
     bound = list(zip([lower]*nradar, [upper]*nradar))
     return dual_annealing(objfun, bound, (b, tp, nseg, f0, f1), callback=callback)
-
-#%% test
-ret = simulated_annealing(32e6, 1e-6, 4, 3, _func, _callback)
-ret.x = ret.x.astype(np.int32)
-print(sorted(ret.x), ret.fun)
