@@ -1,7 +1,7 @@
 from scipy import signal
 from matplotlib import pyplot as plt
 import numpy as np
-from gwu import *
+from chirp.base import *
 
 bw = 4e6
 tp = 10e-6
@@ -56,7 +56,6 @@ plt.grid()
 plt.show()
 
 #%%
-
 f, pxx = signal.periodogram([y, signal.filtfilt(b, a, x)], fs=fs, nfft=4096, return_onesided=False, scaling='spectrum')
 plt.plot(f, mag2db(pxx[0]), label='Pxx')
 plt.plot(f, mag2db(pxx[1]), label='Pyy')

@@ -21,7 +21,7 @@ def func(x, *args):
     objective(cost) function for simulated annealing
     max cross correlation peak over available set of chirp signals
     :param x: 1-D array, parameter
-    :param *args: b, tp, nseg
+    :param args: b, tp, nseg
     :return: f(x)
     """
     x = np.array(x).astype(np.int32)
@@ -53,4 +53,6 @@ def simulated_annealing(b, tp, nseg, nradar, objfun, callback=None):
     f0, f1 = freqx(b, nseg)
     lower, upper = 0, len(f0)
     bound = list(zip([lower]*nradar, [upper]*nradar))
-    return dual_annealing(objfun, bound, (b, tp, nseg, f0, f1), callback=callback)
+    ret =  dual_annealing(objfun, bound, (b, tp, nseg, f0, f1), callback=callback)
+    x = np.array(ret.x).astype(np.int32)
+    return [(f0[i], f1[i]) for i in x], ret.fun

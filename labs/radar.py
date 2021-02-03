@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from scipy import optimize
-from gwu import *
+from chirp.base import *
 
 b, tp, N = 4e6, 10e-6, 7
 f0, f1 = freqx(b, N)

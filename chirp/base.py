@@ -27,3 +27,10 @@ def xcorr(x, y, normalize=True, lags=True):
         return signal.correlate(a, b), signal.correlation_lags(len(x), len(y))
     else:
         return signal.correlate(a, b)
+
+def chirp(b, tp, oversamplerate, f):
+    fs = oversamplerate * b
+    n = int(fs*tp)
+    t = np.arange(n)/fs
+
+    return signal.chirp(t, f[0], tp, f[1])
