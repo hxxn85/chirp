@@ -9,12 +9,21 @@ def _is_unique(x):
 
 def _chirp_correlate(idx1, idx2, *args):
     b, tp, nseg, f0, f1 = args
-    fs = 8*b
-    t = np.arange(int(fs*tp))/fs
+    x = chirp(b, tp, 8, (f0[idx1], f1[idx1]))
+    y = chirp(b, tp, 8, (f0[idx2], f1[idx2]))
 
-    x = signal.chirp(t, f0[idx1], tp, f1[idx1])
-    y = signal.chirp(t, f0[idx2], tp, f1[idx2])
     return  np.max(np.abs(xcorr(x, y, lags=False)))
+
+def _auto(idx, *args):
+    b, tp, nseg, f0, f1 = args
+    x = chirp(b, tp, 8, (f0[idx], f1[idx]))
+    return calc_auto(x)
+
+def _cross(idx1, idx2, *args):
+    b, tp, nseg, f0, f1 = args
+    x = chirp(b, tp, 8, (f0[idx1], f1[idx1]))
+    y = chirp(b, tp, 8, (f0[idx2], f1[idx2]))
+    return calc_cross(x, y)
 
 def func(x, *args):
     """
@@ -28,8 +37,11 @@ def func(x, *args):
     if not _is_unique(x):
         return 1000
 
+    lamb = 0.5
+    auto = np.sum([_auto(idx, *args) for idx in x])
     comb = list(itertools.combinations(x, 2))
-    return np.sum([_chirp_correlate(f[0], f[1], *args) for f in comb])
+    cross = np.sum([_cross(idx1, idx2, *args) for idx1, idx2 in comb])
+    return ((1-lamb) * auto) + (lamb * cross)
 
 def callback(x, f, context):
     print(np.array(x).astype(np.int32), f, context)
